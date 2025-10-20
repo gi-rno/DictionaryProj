@@ -7,34 +7,30 @@ import java.util.Set;
 
 public class DictionaryBuilder {
 	
-	private final double LF = 0.6;
+	static final double LOAD_FACTOR = 0.6;
 	
-	Set<String> words = new HashSet<String>();
+	private Set<String> words = new HashSet<String>();
 	
-	File file;
-	
-	private class Node{
-		
-		private T data;
-		
-		Node next;
-	}
+	private String[] buckets;
 
 	public DictionaryBuilder(int estimatedEntries) {
 		
-		int n = 10;
 		
-		if(calcLF(estimatedEntries) >= 0.6) {
-			
-			String array[] = new String[n*2];
-		}
+		
+		
 	}
 	
 	public DictionaryBuilder(String fileName) throws FileNotFoundException{
 		
-		Scanner inpt = new Scanner(new File(fileName));
+		File file = new File(fileName);
 		
-		long eUW = estimatedUniqueWords(file.length());
+		Scanner inpt = new Scanner((file));
+		
+		long estimatedUniqueWords = file.length() / 100;
+		
+		double tableSize = estimatedUniqueWords / 0.6;
+		
+		buckets = new String[(int)tableSize];
 		
 		inpt.useDelimiter(" ");
 		
@@ -45,7 +41,23 @@ public class DictionaryBuilder {
 		
 		int wordNum = words.size();
 		
-		calcLF(wordNum);
+		double loadFac = calcLF(wordNum, (int)tableSize);
+		
+			if(loadFac >= LOAD_FACTOR) {
+							
+				buckets = new String[fourK3Prime((int)tableSize)];
+			}
+			
+		int i = 0;
+			
+		for(String word : words) {
+			
+			buckets[i] = word;
+			
+			i++;
+		}
+		
+		
 		
 	    
 	}
@@ -70,19 +82,50 @@ public class DictionaryBuilder {
 		
 	}
 	
-	public double calcLF(int estimatedEntries) {
-		//recommended table size
-		double tableSize = (estimatedEntries / 0.6);
-	    //load factor
-	    double lF = estimatedEntries / tableSize;
+	public double calcLF(int numStoredElements, int tableSize) {
+		
+		double LF = (double)numStoredElements / tableSize;
 	    
-	    return lF;
-	    
-	    
+	    return LF;
 	}
 	
-	public double estimatedUniqueWords(long fileSize) {
+	private int fourK3Prime(int tSize) {
 		
-		
+		while(true) {
+		if(tSize % 4 != 3) {
+			
+			tSize++;
+		}
+		if(isPrime(tSize) && tSize % 4 == 3) {
+			
+			return tSize;
+		}
+		tSize++;
+		}
 	}
+	
+	private boolean isPrime(int n) {
+		
+		if(n<=1) {
+			
+			return false;
+		}
+		if(n == 2 || n == 3) {
+			
+			return true;
+		}
+		if(n % 2 == 0 || n % 3 == 0) {
+			
+			return false;
+		}
+		for(int i = 5; i <= Math.sqrt(n); i = i + 6) {
+			
+			if(n % i == 0 || n % (i + 2) == 0) {
+				
+				return false;
+			}
+		}
+		return true;
+	}
+	
 }
