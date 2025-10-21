@@ -9,9 +9,11 @@ public class DictionaryBuilder {
 	
 	static final double LOAD_FACTOR = 0.6;
 	
-	private Set<String> words = new HashSet<String>();
+	private String[] tempArr;
 	
 	private String[] buckets;
+	
+	private String[] uniqueArr;
 
 	public DictionaryBuilder(int estimatedEntries) {
 		
@@ -30,16 +32,42 @@ public class DictionaryBuilder {
 		
 		double tableSize = estimatedUniqueWords / 0.6;
 		
+		tempArr = new String[(int)tableSize];
+		
+		uniqueArr = new String[(int)tableSize];
+		
 		buckets = new String[(int)tableSize];
 		
 		inpt.useDelimiter(" ");
 		
 		while(inpt.hasNext()) {
 			
-			words.add(inpt.next().strip().toLowerCase());
+			int i = 0;
+			
+			tempArr[i] = (inpt.next().replaceAll("[!.,'\"?;-]", "").toLowerCase());
+			
+			i++;
 		}
 		
-		int wordNum = words.size();
+		int index = 0;
+		
+		for(int i = index; i < tempArr.length;i++) {
+			
+			String current = tempArr[i];
+			
+			for(int j = 0; j < uniqueArr.length; j++) {
+				
+				if(uniqueArr[j].equals(current)) {
+					
+					
+				}
+				uniqueArr[index] = current;
+				
+				index++;
+			}
+		}
+		
+		int wordNum = buckets.length;
 		
 		double loadFac = calcLF(wordNum, (int)tableSize);
 		
