@@ -11,15 +11,20 @@ public class DictionaryBuilder {
 	
 	private String[] tempArr;
 	
-	private String[] buckets;
+	private GeneralLinkedList<String>[] buckets;
 	
 	private String[] uniqueArr;
 
 	public DictionaryBuilder(int estimatedEntries) {
 		
+		int tableSize = estimatedEntries / LOAD_FACTOR;
 		
+		buckets = new GeneralLinkedList[tableSize];
 		
-		
+		for(int i = 0; i < buckets.length; i++) {
+			
+			buckets[i] = new GeneralLinkedList<>();
+	}
 	}
 	
 	public DictionaryBuilder(String fileName) throws FileNotFoundException{
@@ -36,38 +41,50 @@ public class DictionaryBuilder {
 		
 		uniqueArr = new String[(int)tableSize];
 		
-		buckets = new String[(int)tableSize];
+		buckets = new GeneralLinkedList[(int)tableSize];
+		
+		for(int i = 0; i < buckets.length; i++) {
+			
+			buckets[i] = new GeneralLinkedList<>();
 		
 		inpt.useDelimiter(" ");
 		
+		int k = 0;
+		
 		while(inpt.hasNext()) {
 			
-			int i = 0;
+			tempArr[k] = (inpt.next().replaceAll("[!.,'\"?;-]", "").toLowerCase());
 			
-			tempArr[i] = (inpt.next().replaceAll("[!.,'\"?;-]", "").toLowerCase());
-			
-			i++;
+			k++;
 		}
 		
 		int index = 0;
 		
-		for(int i = index; i < tempArr.length;i++) {
+		for(int l = 0; l < tempArr.length;l++) {
 			
-			String current = tempArr[i];
+			String current = tempArr[l];
 			
-			for(int j = 0; j < uniqueArr.length; j++) {
+			boolean isUnique = true;
+			
+			for(int j = 0; j < index; j++) {
 				
-				if(uniqueArr[j].equals(current)) {
+				if(current.equals(uniqueArr[j])) {
 					
+					isUnique = false;
 					
+					break;
 				}
+				
+				}
+			if(isUnique) {
+				
 				uniqueArr[index] = current;
 				
 				index++;
 			}
 		}
 		
-		int wordNum = buckets.length;
+		int wordNum = uniqueArr.length;
 		
 		double loadFac = calcLF(wordNum, (int)tableSize);
 		
@@ -76,13 +93,19 @@ public class DictionaryBuilder {
 				buckets = new String[fourK3Prime((int)tableSize)];
 			}
 			
-		int i = 0;
+			for(int m = 0; m < uniqueArr.length; m++) {
+				
+				String word = uniqueArr[m];
+				
+				int hashedWord = word.hashCode();
+				
+				int indexMap = fourK3Prime(hashedWord);
+				
+				indexMap = hashedWord % buckets.length;
+				
+				buckets[indexMap].add(hashedWord);
+			}
 			
-		for(String word : words) {
-			
-			buckets[i] = word;
-			
-			i++;
 		}
 		
 		
